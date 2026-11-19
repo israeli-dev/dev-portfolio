@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:seed": "tsx src/db/seed.ts",
+    "db:schema": "tsx scripts/apply-schema.ts",
     "setup": "tsx src/db/seed.ts",
     "db:reset": "node -e \"require('fs').rmSync('.data',{recursive:true,force:true})\" && tsx src/db/seed.ts",
     "sync:github": "tsx scripts/sync-github.ts"

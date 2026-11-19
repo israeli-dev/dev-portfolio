@@ -3,11 +3,12 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { GeistSerif } from "geist/font/serif";
 import "./globals.css";
+import { siteUrl } from "@/lib/site";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const canonical = siteUrl();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(canonical),
   title: {
     default: "Israel Kolawole — AI Engineer & Geoscience",
     template: "%s · Folio",

@@ -3,7 +3,7 @@
 ## Running
 
 ```bash
-npm test          # 102 tests, ~12 s
+npm test          # 108 tests, ~12 s
 npm run test:watch
 npm run typecheck # includes tests/ and tests/**/*.tsx
 ```
@@ -69,6 +69,12 @@ Because the actions themselves are imported, tests cover validation → authoriz
 - A filled honeypot gets a success response and writes nothing (bots learn nothing).
 - With no owner account the visitor is told the form is closed.
 - Five messages per IP per 10 minutes, then a clear rate-limit message.
+
+**`tests/deployment.test.ts` — 6 tests**
+- Canonical URL resolution: explicit `NEXT_PUBLIC_SITE_URL`, then Vercel's
+  production/deployment hosts, then localhost — with trailing slashes trimmed.
+- Upload validation happens before any disk write: SVG rejected, >2 MB
+  rejected, empty file rejected, path-like account ids rejected.
 
 **`tests/github.test.ts` — 9 tests**
 

@@ -4,10 +4,10 @@ Written down rather than hidden. Each item states the current behaviour, the ris
 
 ## Data layer
 
-1. **PGlite is single-process.**
+1. **PGlite is local-only and single-process.**
    *Current:* locally the database is a directory opened by one Node process. Writing to it from a second process (seed, CLI sync, a `psql` session) while the dev server runs does not make the write visible to the server until it restarts, and concurrent writes are unsafe.
    *Impact:* development only. `README.md` tells you to stop the server before `db:seed` / `db:reset` / `sync:github`.
-   *Next step:* none needed for production (use Postgres); optionally use a managed local Postgres via Docker for multi-process development.
+   *Next step:* use managed Postgres in production (required on Vercel); optionally a local Postgres container for multi-process development.
 
 2. **The `postgres://` driver is not exercised in this environment.**
    *Current:* `createPostgresDriver` uses `postgres.js` and the same parameterised SQL.
@@ -33,7 +33,7 @@ Written down rather than hidden. Each item states the current behaviour, the ris
    *Public pages live at `/u/<handle>`. Adding `handle.folio.app` needs wildcard DNS plus a host-based lookup in `src/app/u/[slug]/page.tsx`.*
 
 7. **Uploads are written to local disk.**
-   *`public/uploads/<userId>/<uuid>.<ext>`, 2 MB, magic-byte checked, SVG rejected. On serverless hosting this directory is ephemeral; replace `src/lib/storage.ts` with S3/R2 before enabling uploads there. Images are not resized or re-encoded.*
+   *`public/uploads/<userId>/<uuid>.<ext>`, 2 MB, magic-byte checked, SVG rejected. On serverless hosting the filesystem is read-only, so the endpoint answers 501 and asks for an image URL instead of failing opaquely; replace `src/lib/storage.ts` with S3/R2 to enable uploads there. Images are not resized or re-encoded.*
 
 8. **Email delivery is optional and has no retry queue.**
    *Without `RESEND_API_KEY`, password-reset links are surfaced in the UI in development and contact messages stay in `/dashboard/inbox`. With the key set, reset links and contact notifications are sent through Resend (`src/lib/mail.ts`). Delivery is fire-and-forget: failures are logged and never block the database write, but there is no retry queue, delivery log or bounce handling.*
@@ -56,7 +56,7 @@ Written down rather than hidden. Each item states the current behaviour, the ris
 ## Quality gaps and next steps
 
 14. **Browser-level tests are missing.**
-    *Auth, CRUD, publishing and rendering are covered by 102 integration tests against a real database, but keyboard navigation, focus management in dialogs, and responsive layout are not automated. No headless browser was available while building this; the next step is Playwright covering signup → wizard → publish → public page, plus an axe accessibility pass.*
+    *Auth, CRUD, publishing and rendering are covered by 108 integration tests against a real database, but keyboard navigation, focus management in dialogs, and responsive layout are not automated. No headless browser was available while building this; the next step is Playwright covering signup → wizard → publish → public page, plus an axe accessibility pass.*
 
 15. **No two-factor authentication or social login.**
     *Email + password with scrypt. TOTP and OAuth (GitHub, Google) are the natural additions; both fit the existing `users`/`sessions` model.*

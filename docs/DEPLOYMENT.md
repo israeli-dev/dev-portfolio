@@ -1,5 +1,61 @@
 # Deployment
 
+## Deploy to Vercel in six steps
+
+Folio runs on Vercel **if the database is a managed Postgres**. The local PGlite
+directory does not survive a serverless deploy (read-only filesystem, ephemeral
+per invocation), so the one hard requirement is a `postgres://` URL.
+
+1. **Create the database.** Vercel Postgres/Neon, Supabase or any Postgres 14+
+   instance. Copy the connection string; keep `?sslmode=require` on it — the
+   driver reads it directly.
+2. **Import the repository.** Vercel → *Add New → Project* → pick
+   `israeli-dev/dev-portfolio`, branch `arena/db32c41c-dev-portfolio` (or `main`
+   once merged). Framework preset: **Next.js**, root directory `./`, install
+   `npm install`, build `npm run build`. No `vercel.json` is required.
+3. **Set environment variables** (Production *and* Preview):
+
+   | Key | Value |
+   | --- | --- |
+   | `DATABASE_URL` | `postgres://user:pass@host/db?sslmode=require` |
+   | `NEXT_PUBLIC_SITE_URL` | `https://your-project.vercel.app` (or your domain) |
+   | `SEED_OWNER_EMAIL` | `owner@folio.local` |
+   | `SEED_OWNER_PASSWORD` | a strong password you choose |
+   | `GITHUB_TOKEN` | optional, read-only public-repo token |
+   | `RESEND_API_KEY` / `EMAIL_FROM` | optional, for reset links and contact email |
+
+   Without `NEXT_PUBLIC_SITE_URL` the app falls back to Vercel's own host, so
+   preview URLs still produce correct canonical links and OG tags.
+4. **Deploy.** The schema is created on the first query, and `/sitemap.xml`
+   tolerates a cold database, so the build does not depend on a seeded DB.
+5. **Seed once, from your machine** (not from Vercel — builds must not write
+   content):
+
+   ```bash
+   DATABASE_URL="postgres://…?sslmode=require" \
+   SEED_OWNER_EMAIL="owner@folio.local" \
+   SEED_OWNER_PASSWORD="your-strong-password" \
+   npm run db:seed
+
+   DATABASE_URL="postgres://…?sslmode=require" npm run sync:github -- israeli-dev israel-kolawole
+   ```
+
+6. **Verify.** `https://your-project.vercel.app/api/health` should report
+   `"database":"reachable"`. Sign in at `/login`, confirm `/u/israel-kolawole`
+   renders, and publish/unpublish once.
+
+### What is different on Vercel
+
+| Area | Behaviour |
+| --- | --- |
+| Database | Must be managed Postgres. PGlite is local-only. |
+| Uploads | The filesystem is read-only, so `/api/uploads` returns **501** with a clear message. Paste an image URL (project `imageUrl`, avatar, cover) instead, or point `src/lib/storage.ts` at S3/R2. Everything else — publishing, editing, GitHub sync — is unaffected. |
+| Schema bootstrap | `CREATE TABLE IF NOT EXISTS` runs once per cold start. Harmless, but run `npm run db:schema` against the database once and keep an eye on cold-start latency. |
+| Rate limiting | In-memory, therefore per instance. Fine for a portfolio; back it with Redis if you open public signups at scale. |
+| Email | Optional. Without `RESEND_API_KEY`, reset links appear in the UI only in development; on Vercel (production) configure the key or reset passwords from the seed/CLI. |
+| Region | Put the function in the same region as the database (Vercel → Settings → Functions) to avoid cross-continent query latency. |
+
+
 ## 1. Environment variables
 
 Copy `.env.example` and fill it in. Nothing in this repository contains a real secret.

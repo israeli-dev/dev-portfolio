@@ -15,6 +15,7 @@ import {
 } from "@/lib/validation";
 import { safeRedirectPath, slugify } from "@/lib/utils";
 import { sendEmail } from "@/lib/mail";
+import { siteUrl } from "@/lib/site";
 import { DEFAULT_SECTIONS } from "@/lib/domain";
 
 function readField(formData: FormData, key: string): string {
@@ -152,7 +153,7 @@ export async function requestPasswordResetAction(
   });
 
   const resetPath = `/reset-password?token=${encodeURIComponent(token)}`;
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const origin = siteUrl();
   const delivery = await sendEmail({
     to: user.email,
     subject: "Reset your Folio password",

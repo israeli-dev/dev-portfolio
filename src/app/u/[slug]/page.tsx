@@ -5,10 +5,9 @@ import { ArrowUpRight } from "lucide-react";
 import { getPublishedPortfolio } from "@/lib/queries";
 import { toPortfolioView } from "@/lib/portfolio-view";
 import { PortfolioRenderer } from "@/components/portfolio/portfolio-renderer";
+import { siteUrl } from "@/lib/site";
 
 type Params = { params: Promise<{ slug: string }> };
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
@@ -48,7 +47,7 @@ export default async function PublicPortfolioPage({ params }: Params) {
     "@type": "Person",
     name: view.title.split(" — ")[0] || portfolio.user.name,
     description: view.headline || view.bio.slice(0, 200),
-    url: `${siteUrl}/u/${view.slug}`,
+    url: `${siteUrl()}/u/${view.slug}`,
     jobTitle: view.headline || undefined,
     email: view.email || undefined,
     address: view.location || undefined,

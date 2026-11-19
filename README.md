@@ -37,12 +37,19 @@ No external service is required. The database is **PGlite** (PostgreSQL compiled
 | `npm run dev` | Development server with fast refresh |
 | `npm run build` / `npm start` | Production build and server |
 | `npm run typecheck` | `tsc --noEmit` across app and tests |
-| `npm test` | 102 Vitest tests against an in-memory Postgres |
+| `npm test` | 108 Vitest tests against an in-memory Postgres |
 | `npm run db:seed` | Idempotent schema creation + seed (owner, portfolio, projects) |
+| `npm run db:schema` | Create/upgrade the schema only, without seeding |
 | `npm run db:reset` | Delete `.data/` and re-seed from scratch |
 | `npm run sync:github -- israeli-dev` | Run a real GitHub sync from the CLI |
 
 > **PGlite is single-process.** Stop `npm run dev` before running `db:seed`, `db:reset` or `sync:github`, then restart it: two processes cannot safely share one PGlite directory. On Postgres this limitation disappears.
+
+## Deploying
+
+Vercel works out of the box **with a managed Postgres** — PGlite's directory does not survive a serverless filesystem. Import the repo, set `DATABASE_URL` (with `?sslmode=require`), `NEXT_PUBLIC_SITE_URL` and `SEED_OWNER_PASSWORD`, deploy, then run `npm run db:seed` once from your machine against the production URL.
+
+The only feature that needs extra work on Vercel is image upload: the filesystem is read-only there, so `/api/uploads` returns a clear 501 and you paste an image URL instead. Step-by-step instructions, environment variables and the full difference list: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ---
 
@@ -119,7 +126,7 @@ Details and threat notes: [`docs/SECURITY.md`](docs/SECURITY.md).
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — layers, data model, the custom query facade and why Prisma/Drizzle are not used, rendering pipeline.
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — environment variables, Postgres setup, migrations, seeding, hosting notes, backups.
-- [`docs/TESTING.md`](docs/TESTING.md) — what the 102 tests cover, how the harness works, what was verified manually.
+- [`docs/TESTING.md`](docs/TESTING.md) — what the 108 tests cover, how the harness works, what was verified manually.
 - [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) — honest gaps and what I would build next.
 - [`docs/SECURITY.md`](docs/SECURITY.md) — auth model, authorization matrix, hardening checklist.
 

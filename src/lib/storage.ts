@@ -60,10 +60,23 @@ export async function saveImageUpload(file: File, userId: string): Promise<Saved
 
   // SVG is deliberately excluded: it can carry scripts.
   const directory = path.join(UPLOAD_ROOT, userId);
-  await mkdir(directory, { recursive: true });
 
-  const filename = `${randomUUID()}.${signature.ext}`;
-  await writeFile(path.join(directory, filename), buffer, { flag: "wx" });
-
-  return { url: `/uploads/${userId}/${filename}`, bytes: file.size, mime: signature.mime };
+  try {
+    await mkdir(directory, { recursive: true });
+    const filename = `${randomUUID()}.${signature.ext}`;
+    await writeFile(path.join(directory, filename), buffer, { flag: "wx" });
+    return { url: `/uploads/${userId}/${filename}`, bytes: file.size, mime: signature.mime };
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException)?.code;
+    // Serverless platforms (Vercel, Netlify) mount the app read-only. Say so
+    // plainly instead of returning an opaque 500 — the alternative, embedding
+    // an image URL, always works.
+    if (code === "EROFS" || code === "EACCES" || code === "EPERM" || code === "ENOSPC") {
+      throw new UploadError(
+        "This deployment cannot store uploads (read-only filesystem). Paste an image URL instead — see docs/DEPLOYMENT.md.",
+        501,
+      );
+    }
+    throw error;
+  }
 }
