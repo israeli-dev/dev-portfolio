@@ -3,7 +3,7 @@
 ## Running
 
 ```bash
-npm test          # 97 tests, ~12 s
+npm test          # 102 tests, ~12 s
 npm run test:watch
 npm run typecheck # includes tests/ and tests/**/*.tsx
 ```
@@ -62,6 +62,13 @@ Because the actions themselves are imported, tests cover validation → authoriz
 - A hidden section removes its content from the markup (not just CSS); hiding Contact also withholds the email.
 - The renderer respects the stored template; unpublished slugs do not resolve publicly.
 - User-supplied `<script>` is escaped rather than injected.
+
+**`tests/contact.test.ts` — 5 tests**
+- A genuine message is stored against the owner's portfolio with `read = false`.
+- Invalid name/email/message returns field errors and stores nothing.
+- A filled honeypot gets a success response and writes nothing (bots learn nothing).
+- With no owner account the visitor is told the form is closed.
+- Five messages per IP per 10 minutes, then a clear rate-limit message.
 
 **`tests/github.test.ts` — 9 tests**
 

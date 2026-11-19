@@ -104,8 +104,10 @@ describe("validation: contact form", () => {
     expect(contactSchema.safeParse({ ...valid, message: "hi" }).success).toBe(false);
   });
 
-  it("rejects a filled honeypot", () => {
-    expect(contactSchema.safeParse({ ...valid, website: "http://spam.example" }).success).toBe(false);
+  it("passes a filled honeypot through for the action to answer silently", () => {
+    const parsed = contactSchema.safeParse({ ...valid, website: "http://spam.example" });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.website).toBe("http://spam.example");
   });
 });
 

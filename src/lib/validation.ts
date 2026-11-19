@@ -59,8 +59,10 @@ export const contactSchema = z.object({
   email: emailSchema,
   subject: z.string().trim().max(120).optional().default(""),
   message: z.string().trim().min(20, "Tell us a little more (20+ characters)").max(4000, "Keep it under 4000 characters"),
-  // Honeypot: real visitors never fill this hidden field.
-  website: z.string().max(0).optional().default(""),
+  // Honeypot: real visitors never fill this hidden field. Parsed rather than
+  // rejected so the action can answer with a success message and teach bots
+  // nothing about the rule.
+  website: z.string().max(200).optional().default(""),
 });
 
 export const profileSchema = z.object({

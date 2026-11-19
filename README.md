@@ -37,7 +37,7 @@ No external service is required. The database is **PGlite** (PostgreSQL compiled
 | `npm run dev` | Development server with fast refresh |
 | `npm run build` / `npm start` | Production build and server |
 | `npm run typecheck` | `tsc --noEmit` across app and tests |
-| `npm test` | 97 Vitest tests against an in-memory Postgres |
+| `npm test` | 102 Vitest tests against an in-memory Postgres |
 | `npm run db:seed` | Idempotent schema creation + seed (owner, portfolio, projects) |
 | `npm run db:reset` | Delete `.data/` and re-seed from scratch |
 | `npm run sync:github -- israeli-dev` | Run a real GitHub sync from the CLI |
@@ -119,7 +119,7 @@ Details and threat notes: [`docs/SECURITY.md`](docs/SECURITY.md).
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — layers, data model, the custom query facade and why Prisma/Drizzle are not used, rendering pipeline.
 - [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — environment variables, Postgres setup, migrations, seeding, hosting notes, backups.
-- [`docs/TESTING.md`](docs/TESTING.md) — what the 97 tests cover, how the harness works, what was verified manually.
+- [`docs/TESTING.md`](docs/TESTING.md) — what the 102 tests cover, how the harness works, what was verified manually.
 - [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) — honest gaps and what I would build next.
 - [`docs/SECURITY.md`](docs/SECURITY.md) — auth model, authorization matrix, hardening checklist.
 

@@ -56,7 +56,7 @@ Written down rather than hidden. Each item states the current behaviour, the ris
 ## Quality gaps and next steps
 
 14. **Browser-level tests are missing.**
-    *Auth, CRUD, publishing and rendering are covered by 97 integration tests against a real database, but keyboard navigation, focus management in dialogs, and responsive layout are not automated. No headless browser was available while building this; the next step is Playwright covering signup → wizard → publish → public page, plus an axe accessibility pass.*
+    *Auth, CRUD, publishing and rendering are covered by 102 integration tests against a real database, but keyboard navigation, focus management in dialogs, and responsive layout are not automated. No headless browser was available while building this; the next step is Playwright covering signup → wizard → publish → public page, plus an axe accessibility pass.*
 
 15. **No two-factor authentication or social login.**
     *Email + password with scrypt. TOTP and OAuth (GitHub, Google) are the natural additions; both fit the existing `users`/`sessions` model.*
